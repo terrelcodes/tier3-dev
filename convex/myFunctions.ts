@@ -26,7 +26,7 @@ export const listNumbers = query({
       .order("desc")
       .take(args.count);
     return {
-      viewer: (await ctx.auth.getUserIdentity())?.name ?? null,
+      viewer: identity.name ?? identity.preferredUsername ?? identity.subject,
       numbers: numbers.reverse().map((number) => number.value),
     };
   },
