@@ -7,9 +7,8 @@ import {
   useQuery,
 } from "convex/react";
 import { api } from "../convex/_generated/api";
-import { SignInButton, SignUpButton, UserButton, useUser } from "@clerk/clerk-react";
-import { ErrorBoundary } from "./ErrorBoundary";
-import { useState } from "react";
+import { SignInButton, SignUpButton, UserButton } from "@clerk/clerk-react";
+
 
 export default function App() {
   return (
@@ -23,9 +22,6 @@ export default function App() {
           <ProtectedContent />
           <PublicContent />
         </Authenticated>
-        <ErrorBoundary>
-          <UnauthenticatedMutation />
-        </ErrorBoundary>
         <Unauthenticated>
           <SignInForm />
           <PublicContent />
@@ -87,32 +83,7 @@ function PublicContent() {
     </section>
   );
 }
-function UnauthenticatedMutation() {
-  const { viewer, numbers } =
-  useQuery(api.myFunctions.listNumbers, {
-    count: 10,
-  }) ?? {};
 
-  const addNumber = useMutation(api.myFunctions.addNumber);
-  const [error, setError] = useState<string | null>(null);
-  function handleAddNumber() {
-    try {
-      void addNumber({ value: Math.floor(Math.random() * 90)+10 });
-    } catch (error) {
-      setError(error as string);
-    }
-  }
-  return (
-    <div>
-      <button onClick={handleAddNumber}>
-        Add a random number
-      </button>
-      {error ?? <p>{error}</p>}
-      <p>Numbers: {numbers?.join(", ")}</p>
-      <p>Viewer: {viewer}</p>
-    </div>
-  );
-}
 
 function ProtectedContent() {
   const { viewer, numbers } =
