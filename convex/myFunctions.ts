@@ -14,8 +14,12 @@ export const listNumbers = query({
 
   // Query implementation.
   handler: async (ctx, args) => {
-    //// Read the database as many times as you need here.
-    //// See https://docs.convex.dev/database/reading-data.
+
+    const identity = await ctx.auth.getUserIdentity()
+    if (!identity) {
+      throw new Error("User not authenticated");
+    }
+
     const numbers = await ctx.db
       .query("numbers")
       // Ordered by _creationTime, return most recent
@@ -37,15 +41,16 @@ export const addNumber = mutation({
 
   // Mutation implementation.
   handler: async (ctx, args) => {
-    //// Insert or modify documents in the database here.
-    //// Mutations can also read from the database like queries.
-    //// See https://docs.convex.dev/database/writing-data.
 
+    const identity = await ctx.auth.getUserIdentity()
+    if (!identity) {
+      throw new Error("User not authenticated");
+    }
     const id = await ctx.db.insert("numbers", { value: args.value });
 
     console.log("Added new document with id:", id);
     // Optionally, return a value from your mutation.
-    // return id;
+    return id
   },
 });
 

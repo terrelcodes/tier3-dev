@@ -7,7 +7,9 @@ import {
   useQuery,
 } from "convex/react";
 import { api } from "../convex/_generated/api";
-import { SignInButton, SignUpButton, UserButton } from "@clerk/clerk-react";
+import { SignInButton, SignUpButton, UserButton, useUser } from "@clerk/clerk-react";
+import { ErrorBoundary } from "./ErrorBoundary";
+import { useState } from "react";
 
 export default function App() {
   return (
@@ -21,6 +23,9 @@ export default function App() {
           <ProtectedContent />
           <PublicContent />
         </Authenticated>
+        <ErrorBoundary>
+          <UnauthenticatedMutation />
+        </ErrorBoundary>
         <Unauthenticated>
           <SignInForm />
           <PublicContent />
@@ -51,35 +56,61 @@ function PublicContent() {
   return (
     <section>
 
-        <p>Useful resources:</p>
-        
-          <div>
-            <ResourceCard
-              title="Convex docs"
-              description="Read comprehensive documentation for all Convex features."
-              href="https://docs.convex.dev/home"
-            />
-            <ResourceCard
-              title="Stack articles"
-              description="Learn about best practices, use cases, and more from a growing
+      <p>Useful resources:</p>
+
+      <div>
+        <ResourceCard
+          title="Convex docs"
+          description="Read comprehensive documentation for all Convex features."
+          href="https://docs.convex.dev/home"
+        />
+        <ResourceCard
+          title="Stack articles"
+          description="Learn about best practices, use cases, and more from a growing
             collection of articles, videos, and walkthroughs."
-              href="https://www.typescriptlang.org/docs/handbook/2/basic-types.html"
-            />
-          </div>
-          <div>
-            <ResourceCard
-              title="Templates"
-              description="Browse our collection of templates to get started quickly."
-              href="https://www.convex.dev/templates"
-            />
-            <ResourceCard
-              title="Discord"
-              description="Join our developer community to ask questions, trade tips & tricks,
+          href="https://www.typescriptlang.org/docs/handbook/2/basic-types.html"
+        />
+      </div>
+      <div>
+        <ResourceCard
+          title="Templates"
+          description="Browse our collection of templates to get started quickly."
+          href="https://www.convex.dev/templates"
+        />
+        <ResourceCard
+          title="Discord"
+          description="Join our developer community to ask questions, trade tips & tricks,
             and show off your projects."
-              href="https://www.convex.dev/community"
-            />
-          </div>
-        </section>
+          href="https://www.convex.dev/community"
+        />
+      </div>
+    </section>
+  );
+}
+function UnauthenticatedMutation() {
+  const { viewer, numbers } =
+  useQuery(api.myFunctions.listNumbers, {
+    count: 10,
+  }) ?? {};
+
+  const addNumber = useMutation(api.myFunctions.addNumber);
+  const [error, setError] = useState<string | null>(null);
+  function handleAddNumber() {
+    try {
+      void addNumber({ value: Math.floor(Math.random() * 90)+10 });
+    } catch (error) {
+      setError(error as string);
+    }
+  }
+  return (
+    <div>
+      <button onClick={handleAddNumber}>
+        Add a random number
+      </button>
+      {error ?? <p>{error}</p>}
+      <p>Numbers: {numbers?.join(", ")}</p>
+      <p>Viewer: {viewer}</p>
+    </div>
   );
 }
 
