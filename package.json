@@ -15,6 +15,7 @@
   "dependencies": {
     "@clerk/clerk-react": "^5.38.1",
     "convex": "^1.23.0",
+    "convex-helpers": "^0.1.100",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
   },
